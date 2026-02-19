@@ -41,44 +41,40 @@ npm run dev
 
 The app runs at `http://localhost:5173`.
 
-## Project Structure
+## About Audivo
 
-```
-Audivo/
-├── client/                         # React frontend
-│   └── src/
-│       ├── app/                    # Redux store & typed hooks
-│       ├── components/             # Shared UI (Layout, Navbar, ProtectedRoute)
-│       ├── features/
-│       │   ├── auth/               # Auth slice, Login/Register pages
-│       │   └── audiobooks/         # Audiobooks page (placeholder)
-│       ├── services/               # API client & service layer
-│       ├── theme/                  # MUI theme
-│       └── types/                  # Shared TypeScript interfaces
-├── server/                         # .NET backend
-│   ├── src/
-│   │   ├── Audivo.Core/            # Domain entities (no dependencies)
-│   │   ├── Audivo.Application/     # Use cases, DTOs, interfaces
-│   │   ├── Audivo.Infrastructure/  # EF Core, Identity, services
-│   │   └── Audivo.API/             # Controllers, middleware, startup
-│   └── Audivo.sln
-└── README.md
-```
+Audivo is an audiobook platform for discovering, organizing, and listening to audiobooks in one place. It combines a modern web interface with a secure API and persistent user data so listeners can continue seamlessly across sessions.
 
-## Architecture
+The application is designed around a simple experience: sign in, browse the catalog, start listening, and pick up from where you left off.
 
-**Clean Architecture** with strict dependency direction:
+## Core Functionalities
 
-```
-API → Application → Core ← Infrastructure
-```
+- **Authentication & session management**
+	- User registration and login
+	- JWT-based authentication with refresh token cookie flow
+	- Protected routes and secure API access
 
-- **Core**: Domain entities, no framework dependencies
-- **Application**: Use cases, DTOs, service interfaces
-- **Infrastructure**: EF Core, Identity, JWT token generation
-- **API**: Thin controllers, global error handling, API versioning (`/api/v1/`)
+- **Gallery & discovery**
+	- Browse the full audiobook catalog
+	- Real-time search by title, author, genre, and description
+	- Filter by genre and author
+	- Sort by recently added, title, or author
 
-## Development Standards
+- **Audiobook playback experience**
+	- Open any title in the player and start listening immediately
+	- Continue listening from the last known position
+	- Track progress and completion state
 
-- **Frontend**: ESLint + Prettier, TypeScript strict mode, no `any`
-- **Backend**: Nullable reference types, Roslyn analyzers, `TreatWarningsAsErrors`, `dotnet format`
+- **Library management**
+	- View uploaded audiobooks
+	- Mark and unmark favorites
+	- Access favorite books in a dedicated view
+
+- **Profile management**
+	- View personal profile information
+	- Update profile details and profile image
+
+- **Platform quality features**
+	- API versioning and centralized exception handling
+	- Validation across backend and frontend flows
+	- Structured, maintainable full-stack setup for continued feature growth
