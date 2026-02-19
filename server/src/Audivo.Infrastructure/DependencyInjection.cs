@@ -75,6 +75,7 @@ public static class DependencyInjection
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<IAudiobookService, AudiobookService>();
         services.AddScoped<IPlayerService, PlayerService>();
+        services.AddScoped<ILibraryService, LibraryService>();
 
         return services;
     }

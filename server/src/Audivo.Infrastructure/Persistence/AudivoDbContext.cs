@@ -22,6 +22,8 @@ public class AudivoDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
 
+      public DbSet<FavoriteAudiobook> FavoriteAudiobooks => Set<FavoriteAudiobook>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -109,5 +111,19 @@ public class AudivoDbContext : IdentityDbContext<ApplicationUser>
                   .HasForeignKey(e => e.AudiobookId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
+
+            builder.Entity<FavoriteAudiobook>(entity =>
+            {
+                  entity.HasKey(e => e.Id);
+                  entity.HasIndex(e => new { e.UserId, e.AudiobookId }).IsUnique();
+                  entity.HasOne(e => e.User)
+                          .WithMany(u => u.FavoriteAudiobooks)
+                          .HasForeignKey(e => e.UserId)
+                          .OnDelete(DeleteBehavior.Cascade);
+                  entity.HasOne(e => e.Audiobook)
+                          .WithMany(a => a.FavoriteByUsers)
+                          .HasForeignKey(e => e.AudiobookId)
+                          .OnDelete(DeleteBehavior.Cascade);
+            });
     }
 }

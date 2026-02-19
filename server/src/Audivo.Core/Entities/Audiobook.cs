@@ -23,4 +23,6 @@ public class Audiobook : BaseEntity
     public ICollection<Chapter> Chapters { get; set; } = [];
 
     public ICollection<Bookmark> Bookmarks { get; set; } = [];
+
+    public ICollection<FavoriteAudiobook> FavoriteByUsers { get; set; } = [];
 }

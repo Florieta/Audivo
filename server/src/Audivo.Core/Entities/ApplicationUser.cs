@@ -21,4 +21,6 @@ public class ApplicationUser : IdentityUser
     public ICollection<Audiobook> UploadedAudiobooks { get; set; } = [];
 
     public ICollection<Bookmark> Bookmarks { get; set; } = [];
+
+    public ICollection<FavoriteAudiobook> FavoriteAudiobooks { get; set; } = [];
 }

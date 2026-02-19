@@ -70,3 +70,15 @@ export interface BookmarkItem {
   readonly label: string | null;
   readonly createdAt: string;
 }
+
+export interface LibraryAudiobook {
+  readonly id: string;
+  readonly title: string;
+  readonly author: string;
+  readonly genre: string | null;
+  readonly coverImageUrl: string | null;
+  readonly audioFileUrl: string | null;
+  readonly totalDurationSeconds: number;
+  readonly createdAt: string;
+  readonly isFavorite: boolean;
+}

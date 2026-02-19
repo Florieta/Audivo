@@ -3,8 +3,9 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
-import AudiobooksPage from './features/audiobooks/AudiobooksPage';
+import GalleryPage from './features/gallery/GalleryPage';
 import AudioPlayerPage from './features/player/AudioPlayerPage';
+import MyLibraryPage from './features/library/MyLibraryPage';
 
 export default function App() {
   return (
@@ -17,7 +18,7 @@ export default function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <AudiobooksPage />
+                <GalleryPage />
               </ProtectedRoute>
             }
           />
@@ -26,6 +27,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AudioPlayerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/library"
+            element={
+              <ProtectedRoute>
+                <MyLibraryPage />
               </ProtectedRoute>
             }
           />

@@ -6,7 +6,7 @@ import {
   Box,
   IconButton,
 } from '@mui/material';
-import { Headphones } from '@mui/icons-material';
+import { Headphones, LibraryBooks } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { logoutAsync } from '../features/auth/authSlice';
@@ -41,6 +41,16 @@ export default function Navbar() {
         >
           Audivo
         </Typography>
+        {isAuthenticated && (
+          <Button
+            color="inherit"
+            startIcon={<LibraryBooks />}
+            onClick={() => navigate('/library')}
+            sx={{ ml: 2 }}
+          >
+            My Library
+          </Button>
+        )}
         <Box sx={{ flexGrow: 1 }} />
         {isAuthenticated ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
