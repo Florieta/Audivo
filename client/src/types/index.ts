@@ -50,3 +50,23 @@ export interface AudiobookFormState {
   readonly coverImage: File | null;
   readonly audioFile: File | null;
 }
+
+export interface PlayerState {
+  readonly audiobookId: string;
+  readonly title: string;
+  readonly author: string;
+  readonly genre: string | null;
+  readonly coverImageUrl: string | null;
+  readonly audioFileUrl: string | null;
+  readonly totalDurationSeconds: number;
+  readonly lastPositionSeconds: number;
+  readonly lastListenedAt: string | null;
+  readonly bookmarks: BookmarkItem[];
+}
+
+export interface BookmarkItem {
+  readonly id: string;
+  readonly positionSeconds: number;
+  readonly label: string | null;
+  readonly createdAt: string;
+}

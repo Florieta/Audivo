@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Alert,
   Box,
@@ -17,11 +18,13 @@ import {
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
@@ -44,6 +47,7 @@ const emptyFormState: AudiobookFormState = {
 
 export default function AudiobooksPage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const { items, isLoading, error, validationErrors } = useAppSelector((state) => state.audiobooks);
 
@@ -265,6 +269,11 @@ export default function AudiobooksPage() {
                   )}
                 </CardContent>
                 <CardActions>
+                  <Tooltip title="Play audiobook">
+                    <IconButton color="primary" aria-label="play" onClick={() => navigate(`/player/${audiobook.id}`)}>
+                      <PlayArrowIcon />
+                    </IconButton>
+                  </Tooltip>
                   <IconButton color="primary" aria-label="edit" onClick={() => openEditDialog(audiobook)}>
                     <EditIcon />
                   </IconButton>

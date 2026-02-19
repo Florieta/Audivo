@@ -20,6 +20,8 @@ public class AudivoDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -91,6 +93,20 @@ public class AudivoDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(e => e.User)
                   .WithMany(u => u.RefreshTokens)
                   .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Bookmark>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Label).HasMaxLength(500);
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Bookmarks)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Audiobook)
+                  .WithMany(a => a.Bookmarks)
+                  .HasForeignKey(e => e.AudiobookId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import AudiobooksPage from './features/audiobooks/AudiobooksPage';
+import AudioPlayerPage from './features/player/AudioPlayerPage';
 
 export default function App() {
   return (
@@ -17,6 +18,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AudiobooksPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/player/:id"
+            element={
+              <ProtectedRoute>
+                <AudioPlayerPage />
               </ProtectedRoute>
             }
           />

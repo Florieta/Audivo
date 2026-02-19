@@ -21,4 +21,6 @@ public class Audiobook : BaseEntity
     public ApplicationUser UploadedBy { get; set; } = null!;
 
     public ICollection<Chapter> Chapters { get; set; } = [];
+
+    public ICollection<Bookmark> Bookmarks { get; set; } = [];
 }

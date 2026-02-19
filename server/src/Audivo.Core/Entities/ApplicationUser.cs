@@ -19,4 +19,6 @@ public class ApplicationUser : IdentityUser
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 
     public ICollection<Audiobook> UploadedAudiobooks { get; set; } = [];
+
+    public ICollection<Bookmark> Bookmarks { get; set; } = [];
 }
