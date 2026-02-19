@@ -78,6 +78,7 @@ const authSlice = createSlice({
           email: action.payload.email,
           firstName: action.payload.firstName,
           lastName: action.payload.lastName,
+          profileImageUrl: action.payload.profileImageUrl,
         };
       })
       .addCase(loginAsync.rejected, (state, action) => {
@@ -99,6 +100,7 @@ const authSlice = createSlice({
           email: action.payload.email,
           firstName: action.payload.firstName,
           lastName: action.payload.lastName,
+          profileImageUrl: action.payload.profileImageUrl,
         };
       })
       .addCase(registerAsync.rejected, (state, action) => {
@@ -115,6 +117,7 @@ const authSlice = createSlice({
           email: action.payload.email,
           firstName: action.payload.firstName,
           lastName: action.payload.lastName,
+          profileImageUrl: action.payload.profileImageUrl,
         };
       })
       .addCase(refreshTokenAsync.rejected, (state) => {

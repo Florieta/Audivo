@@ -65,7 +65,8 @@ public sealed class LocalFileStorageService : IFileStorageService
 
     private static void ValidateFile(FileUpload file, string subfolder, string extension)
     {
-        bool isImage = subfolder.Equals("covers", StringComparison.OrdinalIgnoreCase);
+        bool isImage = subfolder.Equals("covers", StringComparison.OrdinalIgnoreCase)
+            || subfolder.Equals("profiles", StringComparison.OrdinalIgnoreCase);
         var allowedExtensions = isImage ? AllowedImageExtensions : AllowedAudioExtensions;
         var maxSize = isImage ? MaxImageSizeBytes : MaxAudioSizeBytes;
 

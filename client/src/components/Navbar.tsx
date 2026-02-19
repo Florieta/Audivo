@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { deepPurple } from '@mui/material/colors';
-import { Headphones, LibraryBooks } from '@mui/icons-material';
+import { Headphones, LibraryBooks, Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { logoutAsync } from '../features/auth/authSlice';
@@ -20,6 +20,19 @@ export default function Navbar() {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`.toUpperCase() || 'U';
+
+  const resolveImageUrl = (path: string | null | undefined) => {
+    if (!path) {
+      return null;
+    }
+
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://localhost:7196';
+    return `${baseUrl}${path}`;
+  };
 
   const handleLogout = async () => {
     await dispatch(logoutAsync());
@@ -47,20 +60,28 @@ export default function Navbar() {
           Audivo
         </Typography>
         {isAuthenticated && (
-          <Button
-            color="inherit"
-            startIcon={<LibraryBooks />}
-            onClick={() => navigate('/library')}
-            sx={{ ml: 2 }}
-          >
-            My Library
-          </Button>
+          <>
+            <Button
+              color="inherit"
+              startIcon={<LibraryBooks />}
+              onClick={() => navigate('/library')}
+              sx={{ ml: 2 }}
+            >
+              My Library
+            </Button>
+            <Button color="inherit" startIcon={<Person />} onClick={() => navigate('/profile')}>
+              My Profile
+            </Button>
+          </>
         )}
         <Box sx={{ flexGrow: 1 }} />
         {isAuthenticated ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Tooltip title={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || user?.email || 'User'}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: deepPurple[500], fontSize: 14 }}>
+              <Avatar
+                src={resolveImageUrl(user?.profileImageUrl) ?? undefined}
+                sx={{ width: 32, height: 32, bgcolor: deepPurple[500], fontSize: 14 }}
+              >
                 {initials}
               </Avatar>
             </Tooltip>

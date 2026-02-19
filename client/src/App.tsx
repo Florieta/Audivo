@@ -8,6 +8,7 @@ import RegisterPage from './features/auth/RegisterPage';
 import GalleryPage from './features/gallery/GalleryPage';
 import AudioPlayerPage from './features/player/AudioPlayerPage';
 import MyLibraryPage from './features/library/MyLibraryPage';
+import ProfilePage from './features/profile/ProfilePage';
 import { useAppDispatch } from './app/hooks';
 import { refreshTokenAsync } from './features/auth/authSlice';
 
@@ -56,6 +57,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <MyLibraryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

@@ -4,6 +4,7 @@ export interface AuthResponse {
   readonly email: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly profileImageUrl: string | null;
 }
 
 export interface LoginRequest {
@@ -22,6 +23,22 @@ export interface User {
   readonly email: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly profileImageUrl: string | null;
+}
+
+export interface ProfileResponse {
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly fullName: string;
+  readonly email: string;
+  readonly profileImageUrl: string | null;
+  readonly createdAt: string;
+}
+
+export interface UpdateProfileRequest {
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly profileImage: File | null;
 }
 
 export interface ApiError {

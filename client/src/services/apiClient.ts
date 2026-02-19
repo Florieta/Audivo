@@ -70,6 +70,7 @@ apiClient.interceptors.response.use(
               email: data.email,
               firstName: data.firstName,
               lastName: data.lastName,
+              profileImageUrl: data.profileImageUrl,
             },
           }),
         );

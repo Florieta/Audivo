@@ -66,7 +66,8 @@ public sealed class AuthService : IAuthService
             ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
             Email = user.Email!,
             FirstName = user.FirstName,
-            LastName = user.LastName
+            LastName = user.LastName,
+            ProfileImageUrl = user.ProfileImageUrl
         };
 
         return (response, refreshToken);
@@ -95,7 +96,8 @@ public sealed class AuthService : IAuthService
             ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
             Email = user.Email!,
             FirstName = user.FirstName,
-            LastName = user.LastName
+            LastName = user.LastName,
+            ProfileImageUrl = user.ProfileImageUrl
         };
 
         return (response, refreshToken);
@@ -139,7 +141,8 @@ public sealed class AuthService : IAuthService
             ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
             Email = user.Email!,
             FirstName = user.FirstName,
-            LastName = user.LastName
+            LastName = user.LastName,
+            ProfileImageUrl = user.ProfileImageUrl
         };
 
         return (response, newRefreshTokenString);

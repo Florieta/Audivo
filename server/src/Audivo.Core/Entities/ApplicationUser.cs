@@ -8,6 +8,8 @@ public class ApplicationUser : IdentityUser
 
     public required string LastName { get; set; }
 
+    public string? ProfileImageUrl { get; set; }
+
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
