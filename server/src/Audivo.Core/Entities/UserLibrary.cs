@@ -1,5 +1,8 @@
 namespace Audivo.Core.Entities;
 
+/// <summary>
+/// Represents an audiobook saved to a user's personal library.
+/// </summary>
 public class UserLibrary : BaseEntity
 {
     public required string UserId { get; set; }

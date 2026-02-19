@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Audivo.Infrastructure.Services;
 
+/// <summary>
+/// Manages the full lifecycle of audiobooks: creation, updates, deletion, and owner-scoped retrieval.
+/// File uploads are coordinated with <see cref="IFileStorageService"/> with cleanup on failure.
+/// </summary>
 public sealed class AudiobookService : IAudiobookService
 {
     private readonly AudivoDbContext _db;

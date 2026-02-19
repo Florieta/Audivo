@@ -7,6 +7,10 @@ using Microsoft.Extensions.Options;
 
 namespace Audivo.API.Controllers;
 
+/// <summary>
+/// Handles user registration, login, access-token refresh, and sign-out.
+/// Refresh tokens are transported exclusively via an HttpOnly cookie to prevent XSS exposure.
+/// </summary>
 public class AuthController : ApiControllerBase
 {
     private readonly IAuthService _authService;
@@ -23,6 +27,7 @@ public class AuthController : ApiControllerBase
         _environment = environment;
     }
 
+    /// <summary>Registers a new user account and returns an access token with a refresh-token cookie.</summary>
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(
         [FromBody] RegisterRequest request,
@@ -33,6 +38,7 @@ public class AuthController : ApiControllerBase
         return Ok(response);
     }
 
+    /// <summary>Authenticates an existing user and returns an access token with a refreshed cookie.</summary>
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login(
         [FromBody] LoginRequest request,
@@ -43,6 +49,10 @@ public class AuthController : ApiControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Uses the refresh-token cookie to issue a new access token and rotate the refresh token.
+    /// Returns 401 if no cookie is present or the token is invalid/expired.
+    /// </summary>
     [HttpPost("refresh-token")]
     public async Task<ActionResult<AuthResponse>> RefreshToken(CancellationToken cancellationToken)
     {
@@ -57,6 +67,7 @@ public class AuthController : ApiControllerBase
         return Ok(response);
     }
 
+    /// <summary>Revokes the current refresh-token cookie, effectively signing the user out.</summary>
     [Authorize]
     [HttpPost("revoke-token")]
     public async Task<IActionResult> RevokeToken(CancellationToken cancellationToken)
@@ -68,10 +79,22 @@ public class AuthController : ApiControllerBase
         }
 
         await _authService.RevokeTokenAsync(refreshToken, cancellationToken);
-        Response.Cookies.Delete("refreshToken");
+
+        // Delete the cookie using the same options it was set with so the browser removes it correctly.
+        Response.Cookies.Delete("refreshToken", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = _environment.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict
+        });
+
         return NoContent();
     }
 
+    /// <summary>
+    /// Sets the refresh token as an HttpOnly cookie.
+    /// In development the cookie uses <c>SameSite=None</c> to allow cross-scheme requests from Vite's dev server.
+    /// </summary>
     private void SetRefreshTokenCookie(string refreshToken)
     {
         var sameSite = _environment.IsDevelopment()

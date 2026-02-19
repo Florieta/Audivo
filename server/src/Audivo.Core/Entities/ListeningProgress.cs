@@ -1,5 +1,8 @@
 namespace Audivo.Core.Entities;
 
+/// <summary>
+/// Tracks a user's listening position within an audiobook, enabling resume-from-last-position.
+/// </summary>
 public class ListeningProgress : BaseEntity
 {
     public required string UserId { get; set; }

@@ -2,6 +2,9 @@ using Audivo.Application.DTOs.Player;
 
 namespace Audivo.Application.Interfaces;
 
+/// <summary>
+/// Manages listening state for the audio player, including progress persistence and user bookmarks.
+/// </summary>
 public interface IPlayerService
 {
     Task<PlayerStateResponse> GetPlayerStateAsync(Guid audiobookId, string userId, CancellationToken cancellationToken = default);

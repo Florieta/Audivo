@@ -1,5 +1,8 @@
 namespace Audivo.Core.Enums;
 
+/// <summary>
+/// Defines the supported genre categories for audiobooks on the Audivo platform.
+/// </summary>
 public enum AudiobookGenre
 {
     Fiction,

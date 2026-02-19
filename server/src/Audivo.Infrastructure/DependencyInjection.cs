@@ -19,6 +19,12 @@ namespace Audivo.Infrastructure;
 /// </summary>
 public static class DependencyInjection
 {
+    /// <summary>
+    /// Registers EF Core, ASP.NET Core Identity, JWT authentication, and all application services.
+    /// </summary>
+    /// <param name="services">The service collection to configure.</param>
+    /// <param name="configuration">Application configuration used to read connection strings and JWT settings.</param>
+    /// <returns>The configured <see cref="IServiceCollection"/> for chaining.</returns>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)

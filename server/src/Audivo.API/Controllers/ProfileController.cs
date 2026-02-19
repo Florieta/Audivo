@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Audivo.Application.DTOs.Audiobooks;
 using Audivo.Application.DTOs.Profile;
 using Audivo.Application.Interfaces;
@@ -7,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Audivo.API.Controllers;
 
+/// <summary>
+/// Allows the authenticated user to view and update their own profile, including uploading a profile photo.
+/// </summary>
 [Authorize]
 public sealed class ProfileController : ApiControllerBase
 {
@@ -17,6 +19,7 @@ public sealed class ProfileController : ApiControllerBase
         _profileService = profileService;
     }
 
+    /// <summary>Returns the authenticated user's profile information.</summary>
     [HttpGet("me")]
     public async Task<ActionResult<ProfileResponse>> GetCurrentProfile(CancellationToken cancellationToken)
     {
@@ -25,6 +28,7 @@ public sealed class ProfileController : ApiControllerBase
         return Ok(profile);
     }
 
+    /// <summary>Updates the authenticated user's display name and optionally replaces their profile photo.</summary>
     [HttpPut("me")]
     [RequestSizeLimit(5 * 1024 * 1024)]
     public async Task<ActionResult<ProfileResponse>> UpdateCurrentProfile(
@@ -47,10 +51,10 @@ public sealed class ProfileController : ApiControllerBase
         var profile = await _profileService.UpdateCurrentProfileAsync(userId, request, cancellationToken);
         return Ok(profile);
     }
-
-    private string GetUserId() =>
-        User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new UnauthorizedAccessException();
 }
 
-public sealed record UpdateProfileForm(string FirstName, string LastName, IFormFile? ProfileImage);
+/// <summary>Form binding model for updating user profile details and optional profile image upload.</summary>
+public sealed record UpdateProfileForm(
+    [property: System.ComponentModel.DataAnnotations.Required] string FirstName,
+    [property: System.ComponentModel.DataAnnotations.Required] string LastName,
+    IFormFile? ProfileImage);

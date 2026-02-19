@@ -10,6 +10,10 @@ using Microsoft.Extensions.Options;
 
 namespace Audivo.Infrastructure.Services;
 
+/// <summary>
+/// Handles user registration, login, refresh-token rotation, and token revocation.
+/// All token-pair operations return a refresh token string that the API layer must persist as an HttpOnly cookie.
+/// </summary>
 public sealed class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -36,7 +40,7 @@ public sealed class AuthService : IAuthService
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser is not null)
         {
-            throw new Application.Exceptions.ValidationException("Email", "A user with this email already exists.");
+            throw new ValidationException("Email", "A user with this email already exists.");
         }
 
         var user = new ApplicationUser
@@ -53,7 +57,7 @@ public sealed class AuthService : IAuthService
             var errors = result.Errors
                 .GroupBy(e => e.Code)
                 .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
-            throw new Application.Exceptions.ValidationException(errors);
+            throw new ValidationException(errors);
         }
 
         var roles = await _userManager.GetRolesAsync(user);

@@ -2,6 +2,10 @@ using Audivo.Application.DTOs.Audiobooks;
 
 namespace Audivo.Application.Interfaces;
 
+/// <summary>
+/// Abstracts file persistence so the storage backend (local disk, blob storage, etc.) can be swapped
+/// without touching application or domain logic.
+/// </summary>
 public interface IFileStorageService
 {
     /// <summary>

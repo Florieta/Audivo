@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Audivo.Application.DTOs.Player;
 using Audivo.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Audivo.API.Controllers;
 
+/// <summary>
+/// Manages audio playback state: fetching player details, persisting listening progress, and managing bookmarks.
+/// </summary>
 [Authorize]
 public class PlayerController : ApiControllerBase
 {
@@ -79,8 +81,4 @@ public class PlayerController : ApiControllerBase
         await _playerService.DeleteBookmarkAsync(audiobookId, bookmarkId, userId, cancellationToken);
         return NoContent();
     }
-
-    private string GetUserId() =>
-        User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new UnauthorizedAccessException();
 }

@@ -1,5 +1,9 @@
 namespace Audivo.Core.Entities;
 
+/// <summary>
+/// Represents a rotation-based refresh token used to issue new JWT access tokens without re-authentication.
+/// A token is considered active when it has not been revoked and has not expired.
+/// </summary>
 public class RefreshToken : BaseEntity
 {
     public required string Token { get; set; }

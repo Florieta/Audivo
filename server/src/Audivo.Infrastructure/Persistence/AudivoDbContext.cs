@@ -4,6 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Audivo.Infrastructure.Persistence;
 
+/// <summary>
+/// EF Core database context for the Audivo platform.
+/// Extends <see cref="IdentityDbContext{TUser}"/> to include Identity tables alongside
+/// application-specific entities such as audiobooks, listening progress, and bookmarks.
+/// </summary>
 public class AudivoDbContext : IdentityDbContext<ApplicationUser>
 {
     public AudivoDbContext(DbContextOptions<AudivoDbContext> options) : base(options)

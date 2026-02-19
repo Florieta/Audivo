@@ -2,6 +2,10 @@ using Audivo.Application.DTOs.Audiobooks;
 
 namespace Audivo.Application.Interfaces;
 
+/// <summary>
+/// Manages the full lifecycle of audiobooks uploaded by users,
+/// including creation, updates, deletion, and ownership-based retrieval.
+/// </summary>
 public interface IAudiobookService
 {
     Task<IReadOnlyList<AudiobookResponse>> GetUserAudiobooksAsync(string userId, CancellationToken cancellationToken = default);

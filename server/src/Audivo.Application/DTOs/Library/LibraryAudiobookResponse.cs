@@ -1,5 +1,9 @@
 namespace Audivo.Application.DTOs.Library;
 
+/// <summary>
+/// Audiobook entry enriched with the requesting user's listening progress and favourite status,
+/// used throughout the library views (gallery, uploaded, favourites, search).
+/// </summary>
 public sealed record LibraryAudiobookResponse(
     Guid Id,
     string Title,

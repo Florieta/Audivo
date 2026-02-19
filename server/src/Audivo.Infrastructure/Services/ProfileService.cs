@@ -2,27 +2,27 @@ using Audivo.Application.DTOs.Profile;
 using Audivo.Application.Exceptions;
 using Audivo.Application.Interfaces;
 using Audivo.Core.Entities;
-using Audivo.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
 namespace Audivo.Infrastructure.Services;
 
+/// <summary>
+/// Handles reading and updating the authenticated user's profile data and profile photo.
+/// </summary>
 public sealed class ProfileService : IProfileService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IFileStorageService _fileStorageService;
-    private readonly AudivoDbContext _dbContext;
 
     public ProfileService(
         UserManager<ApplicationUser> userManager,
-        IFileStorageService fileStorageService,
-        AudivoDbContext dbContext)
+        IFileStorageService fileStorageService)
     {
         _userManager = userManager;
         _fileStorageService = fileStorageService;
-        _dbContext = dbContext;
     }
 
+    /// <inheritdoc />
     public async Task<ProfileResponse> GetCurrentProfileAsync(string userId, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByIdAsync(userId)
@@ -31,6 +31,7 @@ public sealed class ProfileService : IProfileService
         return MapProfile(user);
     }
 
+    /// <inheritdoc />
     public async Task<ProfileResponse> UpdateCurrentProfileAsync(
         string userId,
         UpdateProfileRequest request,
@@ -62,19 +63,16 @@ public sealed class ProfileService : IProfileService
         user.UpdatedAt = DateTime.UtcNow;
 
         await _userManager.UpdateAsync(user);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return MapProfile(user);
     }
 
-    private static ProfileResponse MapProfile(ApplicationUser user)
-    {
-        return new ProfileResponse(
+    private static ProfileResponse MapProfile(ApplicationUser user) =>
+        new(
             user.FirstName,
             user.LastName,
             $"{user.FirstName} {user.LastName}".Trim(),
             user.Email ?? string.Empty,
             user.ProfileImageUrl,
             user.CreatedAt);
-    }
 }

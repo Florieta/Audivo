@@ -7,8 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Audivo.Infrastructure.Services;
 
+/// <summary>
+/// Provides library views (gallery, uploaded, favourites, search) enriched with per-user progress and favourite data.
+/// </summary>
 public sealed class LibraryService : ILibraryService
 {
+    private const int MaxSearchResults = 60;
+
     private readonly AudivoDbContext _db;
 
     private sealed record ProgressInfo(double ListenedSeconds, DateTime? LastListenedAt);
@@ -166,7 +171,7 @@ public sealed class LibraryService : ILibraryService
                 TotalDurationSeconds = a.TotalDuration.TotalSeconds,
                 a.CreatedAt,
             })
-            .Take(60)
+            .Take(MaxSearchResults)
             .ToListAsync(cancellationToken);
 
         var progressLookup = await GetProgressLookupAsync(userId, results.Select(r => r.Id).ToList(), cancellationToken);

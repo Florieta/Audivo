@@ -7,6 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Audivo.Infrastructure.Services;
 
+/// <summary>
+/// Manages listening progress and bookmarks for the audio player.
+/// Progress is upserted on each save; the audiobook's total duration is updated if the client
+/// reports a more accurate value.
+/// </summary>
 public sealed class PlayerService : IPlayerService
 {
     private readonly AudivoDbContext _db;

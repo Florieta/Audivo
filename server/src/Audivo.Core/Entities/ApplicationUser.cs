@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Audivo.Core.Entities;
 
+/// <summary>
+/// Represents an Audivo platform user, extending ASP.NET Core Identity with profile and relationship data.
+/// </summary>
 public class ApplicationUser : IdentityUser
 {
     public required string FirstName { get; set; }

@@ -1,5 +1,8 @@
 namespace Audivo.Core.Entities;
 
+/// <summary>
+/// Represents an audiobook uploaded to the platform, including metadata and its associated chapters.
+/// </summary>
 public class Audiobook : BaseEntity
 {
     public required string Title { get; set; }

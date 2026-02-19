@@ -10,6 +10,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Audivo.Infrastructure.Services;
 
+/// <summary>
+/// Generates JWT access tokens and cryptographically random refresh tokens,
+/// and validates expired access tokens for refresh-token rotation.
+/// </summary>
 public sealed class TokenService : ITokenService
 {
     private readonly JwtSettings _jwtSettings;

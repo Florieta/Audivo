@@ -1,5 +1,8 @@
 namespace Audivo.Core.Entities;
 
+/// <summary>
+/// Represents a single audio chapter within an audiobook.
+/// </summary>
 public class Chapter : BaseEntity
 {
     public required string Title { get; set; }
