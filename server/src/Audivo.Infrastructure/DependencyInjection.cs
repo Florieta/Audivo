@@ -2,8 +2,8 @@ using System.Text;
 using Audivo.Application.Configuration;
 using Audivo.Application.Interfaces;
 using Audivo.Core.Entities;
-using Audivo.Infrastructure.Persistence;
 using Audivo.Infrastructure.Services;
+using Audivo.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +72,8 @@ public static class DependencyInjection
         // Application services
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        services.AddScoped<IAudiobookService, AudiobookService>();
 
         return services;
     }

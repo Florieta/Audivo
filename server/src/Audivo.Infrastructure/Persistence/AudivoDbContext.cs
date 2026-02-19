@@ -29,9 +29,15 @@ public class AudivoDbContext : IdentityDbContext<ApplicationUser>
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(500).IsRequired();
             entity.Property(e => e.Author).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.Genre).HasMaxLength(200);
             entity.Property(e => e.Narrator).HasMaxLength(300);
             entity.Property(e => e.Description).HasMaxLength(4000);
             entity.Property(e => e.CoverImageUrl).HasMaxLength(2048);
+            entity.Property(e => e.UploadedByUserId).IsRequired();
+            entity.HasOne(e => e.UploadedBy)
+                  .WithMany(u => u.UploadedAudiobooks)
+                  .HasForeignKey(e => e.UploadedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Entity<Chapter>(entity =>

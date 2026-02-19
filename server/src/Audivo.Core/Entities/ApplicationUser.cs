@@ -17,4 +17,6 @@ public class ApplicationUser : IdentityUser
     public ICollection<ListeningProgress> ListeningProgressRecords { get; set; } = [];
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+
+    public ICollection<Audiobook> UploadedAudiobooks { get; set; } = [];
 }

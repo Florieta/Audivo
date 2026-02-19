@@ -31,3 +31,22 @@ export interface ApiError {
   readonly errors?: Record<string, string[]>;
   readonly traceId?: string;
 }
+
+export interface Audiobook {
+  readonly id: string;
+  readonly title: string;
+  readonly author: string;
+  readonly genre: string | null;
+  readonly coverImageUrl: string | null;
+  readonly audioFileUrl: string | null;
+  readonly totalDurationSeconds: number;
+  readonly createdAt: string;
+}
+
+export interface AudiobookFormState {
+  readonly title: string;
+  readonly author: string;
+  readonly genre: string;
+  readonly coverImage: File | null;
+  readonly audioFile: File | null;
+}
