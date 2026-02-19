@@ -9,6 +9,22 @@ export const libraryService = {
     return data;
   },
 
+  async getGalleryFiltered(params?: {
+    genre?: string;
+    author?: string;
+    sortBy?: string;
+  }): Promise<LibraryAudiobook[]> {
+    const { data } = await apiClient.get<LibraryAudiobook[]>(`${BASE_URL}/gallery/filtered`, {
+      params,
+    });
+    return data;
+  },
+
+  async getDistinctAuthors(): Promise<string[]> {
+    const { data } = await apiClient.get<string[]>(`${BASE_URL}/gallery/authors`);
+    return data;
+  },
+
   async getUploadedBooks(): Promise<LibraryAudiobook[]> {
     const { data } = await apiClient.get<LibraryAudiobook[]>(`${BASE_URL}/uploaded`);
     return data;

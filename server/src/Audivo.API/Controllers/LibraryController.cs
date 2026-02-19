@@ -28,6 +28,28 @@ public class LibraryController : ApiControllerBase
         return Ok(books);
     }
 
+    /// <summary>Returns gallery audiobooks filtered by genre, author, and sorted by the specified criteria.</summary>
+    [HttpGet("gallery/filtered")]
+    public async Task<ActionResult<IReadOnlyList<LibraryAudiobookResponse>>> GetGalleryFiltered(
+        [FromQuery] string? genre,
+        [FromQuery] string? author,
+        [FromQuery] string? sortBy,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        var books = await _libraryService.GetGalleryFilteredAsync(userId, genre, author, sortBy, cancellationToken);
+        return Ok(books);
+    }
+
+    /// <summary>Returns a distinct sorted list of all audiobook authors for filter dropdowns.</summary>
+    [HttpGet("gallery/authors")]
+    public async Task<ActionResult<IReadOnlyList<string>>> GetDistinctAuthors(
+        CancellationToken cancellationToken)
+    {
+        var authors = await _libraryService.GetDistinctAuthorsAsync(cancellationToken);
+        return Ok(authors);
+    }
+
     /// <summary>Returns audiobooks uploaded by the authenticated user, enriched with progress data.</summary>
     [HttpGet("uploaded")]
     public async Task<ActionResult<IReadOnlyList<LibraryAudiobookResponse>>> GetUploaded(

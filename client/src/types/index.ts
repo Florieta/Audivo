@@ -93,6 +93,7 @@ export interface LibraryAudiobook {
   readonly title: string;
   readonly author: string;
   readonly genre: string | null;
+  readonly description: string | null;
   readonly coverImageUrl: string | null;
   readonly audioFileUrl: string | null;
   readonly totalDurationSeconds: number;

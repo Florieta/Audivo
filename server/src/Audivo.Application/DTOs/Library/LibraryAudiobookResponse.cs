@@ -9,6 +9,7 @@ public sealed record LibraryAudiobookResponse(
     string Title,
     string Author,
     string? Genre,
+    string? Description,
     string? CoverImageUrl,
     string? AudioFileUrl,
     double TotalDurationSeconds,

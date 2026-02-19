@@ -38,6 +38,7 @@ public sealed class LibraryService : ILibraryService
                 a.Title,
                 a.Author,
                 a.Genre,
+                a.Description,
                 a.CoverImageUrl,
                 AudioFileUrl = a.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
                 TotalDurationSeconds = a.TotalDuration.TotalSeconds,
@@ -52,6 +53,7 @@ public sealed class LibraryService : ILibraryService
             a.Title,
             a.Author,
             a.Genre,
+            a.Description,
             a.CoverImageUrl,
             a.AudioFileUrl,
             a.TotalDurationSeconds,
@@ -61,6 +63,80 @@ public sealed class LibraryService : ILibraryService
             GetLastListenedAt(progressLookup, a.Id),
             a.CreatedAt,
             favoriteIds.Contains(a.Id))).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<LibraryAudiobookResponse>> GetGalleryFilteredAsync(
+        string userId,
+        string? genre = null,
+        string? author = null,
+        string? sortBy = null,
+        CancellationToken cancellationToken = default)
+    {
+        var favoriteIds = await GetFavoriteIdsAsync(userId, cancellationToken);
+
+        var query = _db.Audiobooks.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(genre))
+        {
+            query = query.Where(a => a.Genre != null && a.Genre == genre.Trim());
+        }
+
+        if (!string.IsNullOrWhiteSpace(author))
+        {
+            query = query.Where(a => a.Author == author.Trim());
+        }
+
+        query = sortBy?.ToLowerInvariant() switch
+        {
+            "title" => query.OrderBy(a => a.Title),
+            "author" => query.OrderBy(a => a.Author),
+            "recent" => query.OrderByDescending(a => a.CreatedAt),
+            _ => query.OrderByDescending(a => a.CreatedAt),
+        };
+
+        var books = await query
+            .Select(a => new
+            {
+                a.Id,
+                a.Title,
+                a.Author,
+                a.Genre,
+                a.Description,
+                a.CoverImageUrl,
+                AudioFileUrl = a.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
+                TotalDurationSeconds = a.TotalDuration.TotalSeconds,
+                a.CreatedAt,
+            })
+            .ToListAsync(cancellationToken);
+
+        var progressLookup = await GetProgressLookupAsync(userId, books.Select(b => b.Id).ToList(), cancellationToken);
+
+        return books.Select(a => new LibraryAudiobookResponse(
+            a.Id,
+            a.Title,
+            a.Author,
+            a.Genre,
+            a.Description,
+            a.CoverImageUrl,
+            a.AudioFileUrl,
+            a.TotalDurationSeconds,
+            GetListenedSeconds(progressLookup, a.Id),
+            GetProgressPercent(progressLookup, a.Id, a.TotalDurationSeconds),
+            IsCompleted(progressLookup, a.Id, a.TotalDurationSeconds),
+            GetLastListenedAt(progressLookup, a.Id),
+            a.CreatedAt,
+            favoriteIds.Contains(a.Id))).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<string>> GetDistinctAuthorsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _db.Audiobooks
+            .Select(a => a.Author)
+            .Distinct()
+            .OrderBy(a => a)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<LibraryAudiobookResponse>> GetUploadedBooksAsync(
@@ -78,6 +154,7 @@ public sealed class LibraryService : ILibraryService
                 a.Title,
                 a.Author,
                 a.Genre,
+                a.Description,
                 a.CoverImageUrl,
                 AudioFileUrl = a.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
                 TotalDurationSeconds = a.TotalDuration.TotalSeconds,
@@ -92,6 +169,7 @@ public sealed class LibraryService : ILibraryService
             a.Title,
             a.Author,
             a.Genre,
+            a.Description,
             a.CoverImageUrl,
             a.AudioFileUrl,
             a.TotalDurationSeconds,
@@ -116,6 +194,7 @@ public sealed class LibraryService : ILibraryService
                 f.Audiobook.Title,
                 f.Audiobook.Author,
                 f.Audiobook.Genre,
+                Description = f.Audiobook.Description,
                 f.Audiobook.CoverImageUrl,
                 AudioFileUrl = f.Audiobook.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
                 TotalDurationSeconds = f.Audiobook.TotalDuration.TotalSeconds,
@@ -130,6 +209,7 @@ public sealed class LibraryService : ILibraryService
             f.Title,
             f.Author,
             f.Genre,
+            f.Description,
             f.CoverImageUrl,
             f.AudioFileUrl,
             f.TotalDurationSeconds,
@@ -166,6 +246,7 @@ public sealed class LibraryService : ILibraryService
                 a.Title,
                 a.Author,
                 a.Genre,
+                a.Description,
                 a.CoverImageUrl,
                 AudioFileUrl = a.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
                 TotalDurationSeconds = a.TotalDuration.TotalSeconds,
@@ -181,6 +262,7 @@ public sealed class LibraryService : ILibraryService
             a.Title,
             a.Author,
             a.Genre,
+            a.Description,
             a.CoverImageUrl,
             a.AudioFileUrl,
             a.TotalDurationSeconds,
