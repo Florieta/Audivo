@@ -9,8 +9,11 @@ export const playerService = {
     return data;
   },
 
-  async saveProgress(audiobookId: string, positionSeconds: number): Promise<void> {
-    await apiClient.put(`${PLAYER_BASE}/${audiobookId}/progress`, { positionSeconds });
+  async saveProgress(audiobookId: string, positionSeconds: number, totalDurationSeconds?: number): Promise<void> {
+    await apiClient.put(`${PLAYER_BASE}/${audiobookId}/progress`, {
+      positionSeconds,
+      totalDurationSeconds: totalDurationSeconds ?? null,
+    });
   },
 
   async getBookmarks(audiobookId: string): Promise<BookmarkItem[]> {

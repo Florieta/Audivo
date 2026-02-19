@@ -8,5 +8,9 @@ public sealed record LibraryAudiobookResponse(
     string? CoverImageUrl,
     string? AudioFileUrl,
     double TotalDurationSeconds,
+    double ListenedSeconds,
+    double ProgressPercent,
+    bool IsCompleted,
+    DateTime? LastListenedAt,
     DateTime CreatedAt,
     bool IsFavorite);

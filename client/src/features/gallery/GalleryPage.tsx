@@ -167,7 +167,10 @@ export default function GalleryPage() {
                     </CardContent>
                     <CardActions>
                       <Tooltip title="Play audiobook">
-                        <IconButton color="primary" onClick={() => navigate(`/player/${book.id}`)}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => navigate(`/player/${book.id}`, { state: { from: '/' } })}
+                        >
                           <PlayArrowIcon />
                         </IconButton>
                       </Tooltip>

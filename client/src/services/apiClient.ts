@@ -44,8 +44,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = (originalRequest?.url as string | undefined)?.toLowerCase() ?? '';
+    const isRefreshEndpoint = requestUrl.includes('/api/v1/auth/refresh-token');
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isRefreshEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });

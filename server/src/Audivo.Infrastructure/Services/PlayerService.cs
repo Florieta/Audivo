@@ -63,14 +63,15 @@ public sealed class PlayerService : IPlayerService
             throw new ValidationException("positionSeconds", "Position must be non-negative.");
         }
 
-        // Verify audiobook exists
-        var audiobookExists = await _db.Audiobooks
-            .AnyAsync(a => a.Id == audiobookId, cancellationToken);
-
-        if (!audiobookExists)
+        if (request.TotalDurationSeconds is <= 0)
         {
-            throw new NotFoundException(nameof(Audiobook), audiobookId);
+            throw new ValidationException("totalDurationSeconds", "Total duration must be greater than 0 when provided.");
         }
+
+        // Verify audiobook exists
+        var audiobook = await _db.Audiobooks
+            .FirstOrDefaultAsync(a => a.Id == audiobookId, cancellationToken)
+            ?? throw new NotFoundException(nameof(Audiobook), audiobookId);
 
         var progress = await _db.ListeningProgressRecords
             .FirstOrDefaultAsync(
@@ -93,6 +94,16 @@ public sealed class PlayerService : IPlayerService
             progress.PositionInChapter = TimeSpan.FromSeconds(request.PositionSeconds);
             progress.LastListenedAt = DateTime.UtcNow;
             progress.UpdatedAt = DateTime.UtcNow;
+        }
+
+        if (request.TotalDurationSeconds is > 0)
+        {
+            var reportedDuration = TimeSpan.FromSeconds(request.TotalDurationSeconds.Value);
+            if (audiobook.TotalDuration <= TimeSpan.Zero || Math.Abs((audiobook.TotalDuration - reportedDuration).TotalSeconds) > 1)
+            {
+                audiobook.TotalDuration = reportedDuration;
+                audiobook.UpdatedAt = DateTime.UtcNow;
+            }
         }
 
         await _db.SaveChangesAsync(cancellationToken);

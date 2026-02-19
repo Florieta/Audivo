@@ -11,6 +11,8 @@ public sealed class LibraryService : ILibraryService
 {
     private readonly AudivoDbContext _db;
 
+    private sealed record ProgressInfo(double ListenedSeconds, DateTime? LastListenedAt);
+
     public LibraryService(AudivoDbContext db)
     {
         _db = db;
@@ -38,6 +40,8 @@ public sealed class LibraryService : ILibraryService
             })
             .ToListAsync(cancellationToken);
 
+        var progressLookup = await GetProgressLookupAsync(userId, books.Select(b => b.Id).ToList(), cancellationToken);
+
         return books.Select(a => new LibraryAudiobookResponse(
             a.Id,
             a.Title,
@@ -46,6 +50,10 @@ public sealed class LibraryService : ILibraryService
             a.CoverImageUrl,
             a.AudioFileUrl,
             a.TotalDurationSeconds,
+            GetListenedSeconds(progressLookup, a.Id),
+            GetProgressPercent(progressLookup, a.Id, a.TotalDurationSeconds),
+            IsCompleted(progressLookup, a.Id, a.TotalDurationSeconds),
+            GetLastListenedAt(progressLookup, a.Id),
             a.CreatedAt,
             favoriteIds.Contains(a.Id))).ToList();
     }
@@ -72,6 +80,8 @@ public sealed class LibraryService : ILibraryService
             })
             .ToListAsync(cancellationToken);
 
+        var progressLookup = await GetProgressLookupAsync(userId, books.Select(b => b.Id).ToList(), cancellationToken);
+
         return books.Select(a => new LibraryAudiobookResponse(
             a.Id,
             a.Title,
@@ -80,6 +90,10 @@ public sealed class LibraryService : ILibraryService
             a.CoverImageUrl,
             a.AudioFileUrl,
             a.TotalDurationSeconds,
+            GetListenedSeconds(progressLookup, a.Id),
+            GetProgressPercent(progressLookup, a.Id, a.TotalDurationSeconds),
+            IsCompleted(progressLookup, a.Id, a.TotalDurationSeconds),
+            GetLastListenedAt(progressLookup, a.Id),
             a.CreatedAt,
             favoriteIds.Contains(a.Id))).ToList();
     }
@@ -88,20 +102,38 @@ public sealed class LibraryService : ILibraryService
         string userId,
         CancellationToken cancellationToken = default)
     {
-        return await _db.FavoriteAudiobooks
+        var books = await _db.FavoriteAudiobooks
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.AddedAt)
-            .Select(f => new LibraryAudiobookResponse(
-                f.Audiobook.Id,
+            .Select(f => new
+            {
+                Id = f.Audiobook.Id,
                 f.Audiobook.Title,
                 f.Audiobook.Author,
                 f.Audiobook.Genre,
                 f.Audiobook.CoverImageUrl,
-                f.Audiobook.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
-                f.Audiobook.TotalDuration.TotalSeconds,
-                f.Audiobook.CreatedAt,
-                true))
+                AudioFileUrl = f.Audiobook.Chapters.OrderBy(c => c.OrderIndex).Select(c => c.AudioFileUrl).FirstOrDefault(),
+                TotalDurationSeconds = f.Audiobook.TotalDuration.TotalSeconds,
+                CreatedAt = f.Audiobook.CreatedAt,
+            })
             .ToListAsync(cancellationToken);
+
+        var progressLookup = await GetProgressLookupAsync(userId, books.Select(b => b.Id).ToList(), cancellationToken);
+
+        return books.Select(f => new LibraryAudiobookResponse(
+            f.Id,
+            f.Title,
+            f.Author,
+            f.Genre,
+            f.CoverImageUrl,
+            f.AudioFileUrl,
+            f.TotalDurationSeconds,
+            GetListenedSeconds(progressLookup, f.Id),
+            GetProgressPercent(progressLookup, f.Id, f.TotalDurationSeconds),
+            IsCompleted(progressLookup, f.Id, f.TotalDurationSeconds),
+            GetLastListenedAt(progressLookup, f.Id),
+            f.CreatedAt,
+            true)).ToList();
     }
 
     public async Task<IReadOnlyList<LibraryAudiobookResponse>> SearchAudiobooksAsync(
@@ -137,6 +169,8 @@ public sealed class LibraryService : ILibraryService
             .Take(60)
             .ToListAsync(cancellationToken);
 
+        var progressLookup = await GetProgressLookupAsync(userId, results.Select(r => r.Id).ToList(), cancellationToken);
+
         return results.Select(a => new LibraryAudiobookResponse(
             a.Id,
             a.Title,
@@ -145,6 +179,10 @@ public sealed class LibraryService : ILibraryService
             a.CoverImageUrl,
             a.AudioFileUrl,
             a.TotalDurationSeconds,
+            GetListenedSeconds(progressLookup, a.Id),
+            GetProgressPercent(progressLookup, a.Id, a.TotalDurationSeconds),
+            IsCompleted(progressLookup, a.Id, a.TotalDurationSeconds),
+            GetLastListenedAt(progressLookup, a.Id),
             a.CreatedAt,
             favoriteIds.Contains(a.Id))).ToList();
     }
@@ -196,5 +234,67 @@ public sealed class LibraryService : ILibraryService
             .ToListAsync(cancellationToken);
 
         return favoriteIds.ToHashSet();
+    }
+
+    private async Task<Dictionary<Guid, ProgressInfo>> GetProgressLookupAsync(
+        string userId,
+        List<Guid> audiobookIds,
+        CancellationToken cancellationToken)
+    {
+        if (audiobookIds.Count == 0)
+        {
+            return [];
+        }
+
+        var progressRows = await _db.ListeningProgressRecords
+            .Where(p => p.UserId == userId && audiobookIds.Contains(p.AudiobookId))
+            .Select(p => new
+            {
+                p.AudiobookId,
+                ListenedSeconds = p.PositionInChapter.TotalSeconds,
+                p.LastListenedAt,
+            })
+            .ToListAsync(cancellationToken);
+
+        return progressRows.ToDictionary(
+            p => p.AudiobookId,
+            p => new ProgressInfo(p.ListenedSeconds, p.LastListenedAt));
+    }
+
+    private static double GetListenedSeconds(Dictionary<Guid, ProgressInfo> progressLookup, Guid audiobookId)
+        => progressLookup.TryGetValue(audiobookId, out var progress)
+            ? Math.Max(0, progress.ListenedSeconds)
+            : 0;
+
+    private static DateTime? GetLastListenedAt(Dictionary<Guid, ProgressInfo> progressLookup, Guid audiobookId)
+        => progressLookup.TryGetValue(audiobookId, out var progress)
+            ? progress.LastListenedAt
+            : null;
+
+    private static double GetProgressPercent(
+        Dictionary<Guid, ProgressInfo> progressLookup,
+        Guid audiobookId,
+        double totalDurationSeconds)
+    {
+        if (totalDurationSeconds <= 0)
+        {
+            return 0;
+        }
+
+        var listened = GetListenedSeconds(progressLookup, audiobookId);
+        return Math.Clamp((listened / totalDurationSeconds) * 100, 0, 100);
+    }
+
+    private static bool IsCompleted(
+        Dictionary<Guid, ProgressInfo> progressLookup,
+        Guid audiobookId,
+        double totalDurationSeconds)
+    {
+        if (totalDurationSeconds <= 0)
+        {
+            return false;
+        }
+
+        return GetListenedSeconds(progressLookup, audiobookId) >= totalDurationSeconds - 1;
     }
 }

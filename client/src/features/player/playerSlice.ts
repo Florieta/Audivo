@@ -38,11 +38,15 @@ export const fetchPlayerState = createAsyncThunk(
 export const saveProgressAsync = createAsyncThunk(
   'player/saveProgress',
   async (
-    { audiobookId, positionSeconds }: { audiobookId: string; positionSeconds: number },
+    {
+      audiobookId,
+      positionSeconds,
+      totalDurationSeconds,
+    }: { audiobookId: string; positionSeconds: number; totalDurationSeconds?: number },
     { rejectWithValue },
   ) => {
     try {
-      await playerService.saveProgress(audiobookId, positionSeconds);
+      await playerService.saveProgress(audiobookId, positionSeconds, totalDurationSeconds);
       return positionSeconds;
     } catch (error) {
       return rejectWithValue(toMessage(error));

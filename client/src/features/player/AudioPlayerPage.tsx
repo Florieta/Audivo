@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   Alert,
   Box,
@@ -70,6 +70,7 @@ const PROGRESS_SAVE_INTERVAL = 15_000;
 export default function AudioPlayerPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const { playerState, isLoading, error } = useAppSelector((s) => s.player);
 
@@ -85,6 +86,7 @@ export default function AudioPlayerPage() {
   const [bookmarkDialogOpen, setBookmarkDialogOpen] = useState(false);
   const [bookmarkLabel, setBookmarkLabel] = useState('');
   const [showBookmarks, setShowBookmarks] = useState(false);
+  const backTarget = (location.state as { from?: string } | null)?.from ?? '/';
 
   // Ref to latest currentTime so we can read it in cleanup / save without re-renders
   const currentTimeRef = useRef(0);
@@ -106,7 +108,13 @@ export default function AudioPlayerPage() {
 
     const interval = setInterval(() => {
       if (currentTimeRef.current > 0) {
-        void dispatch(saveProgressAsync({ audiobookId: id, positionSeconds: currentTimeRef.current }));
+        void dispatch(
+          saveProgressAsync({
+            audiobookId: id,
+            positionSeconds: currentTimeRef.current,
+            totalDurationSeconds: duration > 0 ? duration : undefined,
+          }),
+        );
       }
     }, PROGRESS_SAVE_INTERVAL);
 
@@ -118,12 +126,18 @@ export default function AudioPlayerPage() {
     const audiobookId = id;
     return () => {
       if (audiobookId && currentTimeRef.current > 0) {
-        void dispatch(saveProgressAsync({ audiobookId, positionSeconds: currentTimeRef.current }));
+        void dispatch(
+          saveProgressAsync({
+            audiobookId,
+            positionSeconds: currentTimeRef.current,
+            totalDurationSeconds: duration > 0 ? duration : undefined,
+          }),
+        );
       }
     };
     // Only run cleanup on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [dispatch, duration, id]);
 
   // --- Audio element event handlers ---
   const handleLoadedMetadata = useCallback(() => {
@@ -147,7 +161,13 @@ export default function AudioPlayerPage() {
   const handleEnded = useCallback(() => {
     setIsPlaying(false);
     if (id) {
-      void dispatch(saveProgressAsync({ audiobookId: id, positionSeconds: audioRef.current?.duration ?? 0 }));
+      void dispatch(
+        saveProgressAsync({
+          audiobookId: id,
+          positionSeconds: audioRef.current?.duration ?? 0,
+          totalDurationSeconds: audioRef.current?.duration,
+        }),
+      );
     }
   }, [dispatch, id]);
 
@@ -159,7 +179,13 @@ export default function AudioPlayerPage() {
       audio.pause();
       setIsPlaying(false);
       if (id) {
-        void dispatch(saveProgressAsync({ audiobookId: id, positionSeconds: audio.currentTime }));
+        void dispatch(
+          saveProgressAsync({
+            audiobookId: id,
+            positionSeconds: audio.currentTime,
+            totalDurationSeconds: audio.duration > 0 ? audio.duration : undefined,
+          }),
+        );
       }
     } else {
       void audio.play();
@@ -250,7 +276,7 @@ export default function AudioPlayerPage() {
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(backTarget)}>
           Back to Library
         </Button>
       </Container>
@@ -280,7 +306,7 @@ export default function AudioPlayerPage() {
       )}
 
       {/* Back button */}
-      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')} sx={{ mb: 2 }}>
+      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(backTarget)} sx={{ mb: 2 }}>
         Back to Library
       </Button>
 

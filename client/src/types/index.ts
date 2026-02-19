@@ -79,6 +79,10 @@ export interface LibraryAudiobook {
   readonly coverImageUrl: string | null;
   readonly audioFileUrl: string | null;
   readonly totalDurationSeconds: number;
+  readonly listenedSeconds: number;
+  readonly progressPercent: number;
+  readonly isCompleted: boolean;
+  readonly lastListenedAt: string | null;
   readonly createdAt: string;
   readonly isFavorite: boolean;
 }

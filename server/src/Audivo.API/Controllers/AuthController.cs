@@ -11,11 +11,16 @@ public class AuthController : ApiControllerBase
 {
     private readonly IAuthService _authService;
     private readonly JwtSettings _jwtSettings;
+    private readonly IWebHostEnvironment _environment;
 
-    public AuthController(IAuthService authService, IOptions<JwtSettings> jwtSettings)
+    public AuthController(
+        IAuthService authService,
+        IOptions<JwtSettings> jwtSettings,
+        IWebHostEnvironment environment)
     {
         _authService = authService;
         _jwtSettings = jwtSettings.Value;
+        _environment = environment;
     }
 
     [HttpPost("register")]
@@ -69,11 +74,15 @@ public class AuthController : ApiControllerBase
 
     private void SetRefreshTokenCookie(string refreshToken)
     {
+        var sameSite = _environment.IsDevelopment()
+            ? SameSiteMode.None
+            : SameSiteMode.Strict;
+
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = sameSite,
             Expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays)
         };
 

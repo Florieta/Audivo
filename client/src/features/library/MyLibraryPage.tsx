@@ -14,9 +14,11 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  LinearProgress,
   IconButton,
   InputAdornment,
   Stack,
+  Chip,
   TextField,
   Tooltip,
   Typography,
@@ -65,6 +67,18 @@ const resolveImageUrl = (path: string | null) => {
 
 const getGenreLabel = (value: string | null) =>
   GENRE_OPTIONS.find((genre) => genre.value === value)?.label ?? value;
+
+const formatDuration = (totalSeconds: number) => {
+  const clamped = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(clamped / 3600);
+  const minutes = Math.floor((clamped % 3600) / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  return `${minutes}m`;
+};
 
 function SectionCards({
   title,
@@ -149,13 +163,44 @@ function SectionCards({
                       Genre: {getGenreLabel(book.genre)}
                     </Typography>
                   )}
+
+                  <Stack direction="row" spacing={1} sx={{ mt: 1.25 }}>
+                    {book.isCompleted ? (
+                      <Chip label="Completed" color="success" size="small" />
+                    ) : book.progressPercent > 0 ? (
+                      <Chip label="In Progress" color="primary" size="small" />
+                    ) : (
+                      <Chip label="Not Started" size="small" />
+                    )}
+                  </Stack>
+
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {book.progressPercent.toFixed(1)}% completed
+                    </Typography>
+                    <LinearProgress
+                      variant="determinate"
+                      value={book.progressPercent}
+                      sx={{ mt: 0.5, height: 8, borderRadius: 999 }}
+                    />
+                  </Box>
+
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {formatDuration(book.listenedSeconds)} / {formatDuration(book.totalDurationSeconds)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Stats: total listened {formatDuration(book.listenedSeconds)}
+                  </Typography>
                 </CardContent>
                 <CardActions>
-                  <Tooltip title="Play audiobook">
-                    <IconButton color="primary" onClick={() => onPlay(book.id)}>
-                      <PlayArrowIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <Button
+                    size="small"
+                    variant={book.progressPercent > 0 ? 'contained' : 'outlined'}
+                    startIcon={<PlayArrowIcon />}
+                    onClick={() => onPlay(book.id)}
+                  >
+                    {book.progressPercent > 0 && !book.isCompleted ? 'Resume Listening' : 'Play'}
+                  </Button>
                   {showOwnerActions && onEdit && onDelete && (
                     <>
                       <Tooltip title="Edit audiobook">
@@ -164,7 +209,7 @@ function SectionCards({
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete audiobook">
-                        <IconButton color="error" onClick={() => onDelete(book.id)}>
+                        <IconButton color="primary" onClick={() => onDelete(book.id)}>
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -201,6 +246,17 @@ export default function MyLibraryPage() {
   useEffect(() => {
     void dispatch(fetchLibrarySections());
   }, [dispatch]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      void dispatch(fetchLibrarySections());
+      if (searchTerm.trim()) {
+        void dispatch(searchLibraryAudiobooks(searchTerm));
+      }
+    }, 15000);
+
+    return () => clearInterval(intervalId);
+  }, [dispatch, searchTerm]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -384,7 +440,7 @@ export default function MyLibraryPage() {
             <SectionCards
               books={searchResults}
               onFavoriteToggle={onFavoriteToggle}
-              onPlay={(bookId) => navigate(`/player/${bookId}`)}
+              onPlay={(bookId) => navigate(`/player/${bookId}`, { state: { from: '/library' } })}
             />
           )}
         </Box>
@@ -395,7 +451,7 @@ export default function MyLibraryPage() {
         subtitle="All audiobooks you uploaded are kept here."
         books={uploadedBooks}
         onFavoriteToggle={onFavoriteToggle}
-        onPlay={(bookId) => navigate(`/player/${bookId}`)}
+        onPlay={(bookId) => navigate(`/player/${bookId}`, { state: { from: '/library' } })}
         showOwnerActions
         onEdit={openEditDialog}
         onDelete={(bookId) => {
@@ -408,7 +464,7 @@ export default function MyLibraryPage() {
         subtitle="Favourite books can include your own uploads and books from other users."
         books={favoriteBooks}
         onFavoriteToggle={onFavoriteToggle}
-        onPlay={(bookId) => navigate(`/player/${bookId}`)}
+        onPlay={(bookId) => navigate(`/player/${bookId}`, { state: { from: '/library' } })}
       />
 
       <Dialog open={isFormOpen} onClose={closeFormDialog} fullWidth maxWidth="sm">

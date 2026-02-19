@@ -5,7 +5,10 @@ import {
   Button,
   Box,
   IconButton,
+  Avatar,
+  Tooltip,
 } from '@mui/material';
+import { deepPurple } from '@mui/material/colors';
 import { Headphones, LibraryBooks } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
@@ -15,6 +18,8 @@ export default function Navbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
+  const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`.toUpperCase() || 'U';
 
   const handleLogout = async () => {
     await dispatch(logoutAsync());
@@ -54,9 +59,11 @@ export default function Navbar() {
         <Box sx={{ flexGrow: 1 }} />
         {isAuthenticated ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body2">
-              {user?.firstName} {user?.lastName}
-            </Typography>
+            <Tooltip title={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || user?.email || 'User'}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: deepPurple[500], fontSize: 14 }}>
+                {initials}
+              </Avatar>
+            </Tooltip>
             <Button color="inherit" onClick={handleLogout}>
               Sign Out
             </Button>
