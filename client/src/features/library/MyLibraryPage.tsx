@@ -242,6 +242,8 @@ export default function MyLibraryPage() {
   const [selectedAudiobook, setSelectedAudiobook] = useState<LibraryAudiobook | null>(null);
   const [formState, setFormState] = useState<AudiobookFormState>(emptyFormState);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     void dispatch(fetchLibrarySections());
@@ -305,10 +307,15 @@ export default function MyLibraryPage() {
   };
 
   const closeFormDialog = () => {
+    if (isSubmitting) {
+      return;
+    }
+
     setIsFormOpen(false);
     setSelectedAudiobook(null);
     setFormState(emptyFormState);
     setLocalError(null);
+    setUploadProgress(0);
   };
 
   const onFieldChange = (field: keyof AudiobookFormState) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -341,11 +348,14 @@ export default function MyLibraryPage() {
       }
     }
 
+    setIsSubmitting(true);
+    setUploadProgress(0);
+
     try {
       if (selectedAudiobook) {
-        await audiobookService.updateAudiobook(selectedAudiobook.id, formState);
+        await audiobookService.updateAudiobook(selectedAudiobook.id, formState, setUploadProgress);
       } else {
-        await audiobookService.createAudiobook(formState);
+        await audiobookService.createAudiobook(formState, setUploadProgress);
       }
 
       await dispatch(fetchLibrarySections());
@@ -355,6 +365,9 @@ export default function MyLibraryPage() {
       closeFormDialog();
     } catch (submitError) {
       setLocalError(submitError instanceof Error ? submitError.message : 'Failed to save audiobook.');
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
     }
   };
 
@@ -469,6 +482,16 @@ export default function MyLibraryPage() {
 
       <Dialog open={isFormOpen} onClose={closeFormDialog} fullWidth maxWidth="sm">
         <DialogTitle>{selectedAudiobook ? 'Edit Audiobook' : 'Add Audiobook'}</DialogTitle>
+        {isSubmitting && (
+          <Box sx={{ px: 3 }}>
+            <LinearProgress variant="determinate" value={uploadProgress} sx={{ borderRadius: 1 }} />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, textAlign: 'center' }}>
+              {uploadProgress < 100
+                ? `Uploading… ${uploadProgress}%`
+                : 'Processing on server…'}
+            </Typography>
+          </Box>
+        )}
         <Box component="form" onSubmit={submitForm}>
           <DialogContent>
             <Stack spacing={2}>
@@ -477,12 +500,14 @@ export default function MyLibraryPage() {
                 value={formState.title}
                 onChange={onFieldChange('title')}
                 required
+                disabled={isSubmitting}
               />
               <TextField
                 label="Author"
                 value={formState.author}
                 onChange={onFieldChange('author')}
                 required
+                disabled={isSubmitting}
               />
               <TextField
                 label="Genre"
@@ -491,6 +516,7 @@ export default function MyLibraryPage() {
                 select
                 SelectProps={{ native: true }}
                 InputLabelProps={{ shrink: true }}
+                disabled={isSubmitting}
               >
                 <option value="">Select genre</option>
                 {GENRE_OPTIONS.map((genre) => (
@@ -514,7 +540,7 @@ export default function MyLibraryPage() {
               />
 
               <Stack direction="row" spacing={2} alignItems="center">
-                <Button variant="outlined" component="label">
+                <Button variant="outlined" component="label" disabled={isSubmitting}>
                   Upload Cover Image
                   <input hidden type="file" accept={IMAGE_ACCEPT} onChange={onFileChange('coverImage')} />
                 </Button>
@@ -525,7 +551,7 @@ export default function MyLibraryPage() {
               </Stack>
 
               <Stack direction="row" spacing={2} alignItems="center">
-                <Button variant="outlined" component="label">
+                <Button variant="outlined" component="label" disabled={isSubmitting}>
                   Upload Audio File
                   <input hidden type="file" accept={AUDIO_ACCEPT} onChange={onFileChange('audioFile')} />
                 </Button>
@@ -537,9 +563,9 @@ export default function MyLibraryPage() {
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeFormDialog}>Cancel</Button>
-            <Button type="submit" variant="contained">
-              {selectedAudiobook ? 'Save Changes' : 'Upload'}
+            <Button onClick={closeFormDialog} disabled={isSubmitting}>Cancel</Button>
+            <Button type="submit" variant="contained" disabled={isSubmitting}>
+              {isSubmitting ? 'Uploading…' : selectedAudiobook ? 'Save Changes' : 'Upload'}
             </Button>
           </DialogActions>
         </Box>

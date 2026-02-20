@@ -57,7 +57,7 @@ public sealed class ProfileService : IProfileService
         {
             var oldImage = user.ProfileImageUrl;
             user.ProfileImageUrl = await _fileStorageService.SaveFileAsync(request.ProfileImage, "profiles", cancellationToken);
-            _fileStorageService.DeleteFile(oldImage);
+            await _fileStorageService.DeleteFileAsync(oldImage, cancellationToken);
         }
 
         user.UpdatedAt = DateTime.UtcNow;

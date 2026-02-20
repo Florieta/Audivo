@@ -107,8 +107,7 @@ export default function GalleryPage() {
       (b) =>
         b.title.toLowerCase().includes(q) ||
         b.author.toLowerCase().includes(q) ||
-        (b.genre && getGenreLabel(b.genre).toLowerCase().includes(q)) ||
-        (b.description && b.description.toLowerCase().includes(q)),
+        (b.genre && getGenreLabel(b.genre).toLowerCase().includes(q)),
     );
   }, [books, debouncedSearch]);
 
@@ -165,7 +164,7 @@ export default function GalleryPage() {
         {/* Search */}
         <TextField
           size="small"
-          placeholder="Search by title, author, genre, or description…"
+          placeholder="Search by title, author, or genre…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           slotProps={{

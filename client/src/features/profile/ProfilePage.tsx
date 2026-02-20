@@ -150,14 +150,14 @@ export default function ProfilePage() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Card sx={{ maxWidth: 520, mx: 'auto' }}>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Card sx={{ maxWidth: 620, mx: 'auto' }}>
         <CardContent>
           <Stack spacing={2.5} alignItems="center">
             {displayImage ? (
-              <Avatar src={displayImage} alt={profile?.fullName} sx={{ width: 96, height: 96 }} />
+              <Avatar src={displayImage} alt={profile?.fullName} sx={{ width: 120, height: 120 }} />
             ) : (
-              <Avatar sx={{ width: 96, height: 96, fontSize: 32, bgcolor: 'primary.main' }}>{initials}</Avatar>
+              <Avatar sx={{ width: 120, height: 120, fontSize: 40, bgcolor: 'primary.main' }}>{initials}</Avatar>
             )}
 
             <Typography variant="h5" sx={{ fontWeight: 700 }}>

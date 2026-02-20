@@ -54,6 +54,9 @@ public static class DependencyInjection
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
 
+        // Cloudinary settings
+        services.Configure<CloudinarySettings>(configuration.GetSection(CloudinarySettings.SectionName));
+
         // JWT Authentication
         services.AddAuthentication(options =>
         {
@@ -78,7 +81,7 @@ public static class DependencyInjection
         // Application services
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        services.AddScoped<IFileStorageService, CloudinaryFileStorageService>();
         services.AddScoped<IAudiobookService, AudiobookService>();
         services.AddScoped<IPlayerService, PlayerService>();
         services.AddScoped<ILibraryService, LibraryService>();

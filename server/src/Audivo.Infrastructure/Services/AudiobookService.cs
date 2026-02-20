@@ -58,7 +58,7 @@ public sealed class AudiobookService : IAudiobookService
         catch
         {
             // If audio upload fails after cover was saved, clean up the cover file
-            _fileStorage.DeleteFile(coverUrl);
+            await _fileStorage.DeleteFileAsync(coverUrl, cancellationToken);
             throw;
         }
 
@@ -121,7 +121,7 @@ public sealed class AudiobookService : IAudiobookService
         {
             var oldCover = audiobook.CoverImageUrl;
             audiobook.CoverImageUrl = await _fileStorage.SaveFileAsync(request.CoverImage, "covers", cancellationToken);
-            _fileStorage.DeleteFile(oldCover);
+            await _fileStorage.DeleteFileAsync(oldCover, cancellationToken);
         }
 
         if (request.AudioFile is not null)
@@ -143,7 +143,7 @@ public sealed class AudiobookService : IAudiobookService
             {
                 var oldAudio = chapter.AudioFileUrl;
                 chapter.AudioFileUrl = newAudio;
-                _fileStorage.DeleteFile(oldAudio);
+                await _fileStorage.DeleteFileAsync(oldAudio, cancellationToken);
             }
         }
 
@@ -165,11 +165,11 @@ public sealed class AudiobookService : IAudiobookService
             throw new UnauthorizedAccessException();
         }
 
-        // Clean up physical files before removing the DB record
-        _fileStorage.DeleteFile(audiobook.CoverImageUrl);
+        // Clean up files before removing the DB record
+        await _fileStorage.DeleteFileAsync(audiobook.CoverImageUrl, cancellationToken);
         foreach (var chapter in audiobook.Chapters)
         {
-            _fileStorage.DeleteFile(chapter.AudioFileUrl);
+            await _fileStorage.DeleteFileAsync(chapter.AudioFileUrl, cancellationToken);
         }
 
         _db.Audiobooks.Remove(audiobook);

@@ -10,6 +10,7 @@ interface LibraryState {
   readonly isLoading: boolean;
   readonly isSearching: boolean;
   readonly error: string | null;
+  readonly isInitialLoadDone: boolean;
 }
 
 const initialState: LibraryState = {
@@ -19,6 +20,7 @@ const initialState: LibraryState = {
   isLoading: false,
   isSearching: false,
   error: null,
+  isInitialLoadDone: false,
 };
 
 const toMessage = (error: unknown) => {
@@ -97,11 +99,14 @@ const librarySlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchLibrarySections.pending, (state) => {
-        state.isLoading = true;
+        if (!state.isInitialLoadDone) {
+          state.isLoading = true;
+        }
         state.error = null;
       })
       .addCase(fetchLibrarySections.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.isInitialLoadDone = true;
         state.uploadedBooks = action.payload.uploadedBooks;
         state.favoriteBooks = action.payload.favoriteBooks;
       })

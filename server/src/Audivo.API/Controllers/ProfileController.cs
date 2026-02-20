@@ -54,7 +54,13 @@ public sealed class ProfileController : ApiControllerBase
 }
 
 /// <summary>Form binding model for updating user profile details and optional profile image upload.</summary>
-public sealed record UpdateProfileForm(
-    [property: System.ComponentModel.DataAnnotations.Required] string FirstName,
-    [property: System.ComponentModel.DataAnnotations.Required] string LastName,
-    IFormFile? ProfileImage);
+public sealed class UpdateProfileForm
+{
+    [System.ComponentModel.DataAnnotations.Required]
+    public required string FirstName { get; set; }
+
+    [System.ComponentModel.DataAnnotations.Required]
+    public required string LastName { get; set; }
+
+    public IFormFile? ProfileImage { get; set; }
+}
