@@ -60,7 +60,7 @@ const formatTime = (seconds: number): string => {
 const resolveUrl = (path: string | null): string | null => {
   if (!path) return null;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  const baseUrl = import.meta.env.VITE_API_URL || 'https://localhost:7001';
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://localhost:7196';
   return `${baseUrl}${path}`;
 };
 

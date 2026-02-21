@@ -36,6 +36,7 @@ Swagger UI: `https://localhost:7196/swagger`
 ```bash
 cd client
 npm install
+# copy .env.example to .env and keep the default API URL for local dev
 npm run dev
 ```
 

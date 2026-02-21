@@ -61,7 +61,7 @@ const resolveImageUrl = (path: string | null) => {
     return path;
   }
 
-  const baseUrl = import.meta.env.VITE_API_URL || 'https://localhost:7001';
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://localhost:7196';
   return `${baseUrl}${path}`;
 };
 
